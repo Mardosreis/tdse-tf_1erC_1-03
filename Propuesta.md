@@ -1,7 +1,7 @@
 # Ascensor Inteligente
 
 **Autores:** Uma Toscan, Mariana Dos Reis, Felipe Colodro  
-**Padrones:** [Completar]  
+**Padrones:** 111106, 111545, 106433
 **Fecha:** 2do cuatrimestre 2026  
 
 ---
