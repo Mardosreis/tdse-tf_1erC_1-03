@@ -1,6 +1,3 @@
-<p align="center">
-  <img src="./img/Logo-FIUBA.svg" alt="logo FIUBA">
-</p>
 
 # Memoria del Trabajo Final: Ascensor Embebido de 3 Pisos con Control de Acceso RFID
 
@@ -11,14 +8,19 @@
     <th>Mail</th>
   </tr>
   <tr>
-    <td>[COMPLETAR: Apellido, Nombre]</td>
-    <td>[COMPLETAR]</td>
-    <td>[COMPLETAR]@fi.uba.ar</td>
+    <td>Colodro, Felipe]</td>
+    <td>106.433</td>
+    <td>fcolodro@fi.uba.ar</td>
   </tr>
   <tr>
-    <td>[COMPLETAR: Apellido, Nombre]</td>
-    <td>[COMPLETAR]</td>
-    <td>[COMPLETAR]@fi.uba.ar</td>
+    <td>dos Reis, Mariana]</td>
+    <td>111106</td>
+    <td>utoscan@fi.uba.ar</td>
+  </tr>  
+  <tr>
+    <td>Toscan, Uma]</td>
+    <td>111106</td>
+    <td>utoscan@fi.uba.ar</td>
   </tr>
 </table>
 
