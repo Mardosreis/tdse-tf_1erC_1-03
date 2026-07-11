@@ -1,0 +1,279 @@
+# Memoria del Trabajo Final: Ascensor Embebido de 3 Pisos con Control de Acceso RFID
+
+| Autor | Padrón | Mail |
+|---|---|---|
+| [Colodro, Felipe |106433| fcolodro@fi.uba.ar ]
+| [dos Reis,Mariana|111545 |mdosreis@fi.uba.ar ]
+| [Toscan, Uma|111106|utoscan@fi.uba.ar ]
+
+<p align="center">2026 | 1er Cuatrimestre</p>
+<p align="center">Taller de Sistemas Embebidos (TA134)</p>
+<p align="center">Universidad de Buenos Aires | Facultad de Ingeniería</p>
+
+## Resumen
+
+En el presente trabajo tiene como objetivo desarrolar una maqueta funcional de un ascensor de 3 paradas (Planta Baja, Piso 1 y Piso 2) basada en una placa STM32 Nucleo-F103, programada en lenguaje C bajo el paradigma Bare Metal (sin sistema operativo). El sistema gestiona el llamado de piso, el desplazamiento del motorreductor, la apertura/cierre de puerta, la detección de sobrecarga mediante celda de carga, y el control de acceso mediante tarjetas RFID.
+
+El diseño de software se estructura mediante un Ejecutor Cíclico (Super-Loop) con base de tiempo de 1ms (SysTick → Callback), organizado en las etapas Escrutar → Procesar → Actuar, donde la etapa de Procesar implementa una Máquina de Estados Finitos (FSM) que gobierna el comportamiento del ascensor. La comunicación entre etapas se resuelve mediante una cola de eventos (array de estructuras), lo que permite que fuentes de entrada heterogéneas (botones físicos, comandos por Bluetooth, sensores) se traten de forma unificada.
+
+El sistema cuenta además con persistencia de configuración en Flash interna, control de velocidad del motor por PWM, indicación visual (LEDs) y sonora (buzzer), pantalla LCD 16x2 por I2C, un modo de configuración (SET_UP) con menú interactivo, un modo de bajo consumo, y selección física de modo mediante Dip Switch.
+
+## Índice
+
+1. Introducción general
+   1.1. Objetivo del trabajo
+   1.2. Motivación y análisis de mercado
+2. Introducción específica
+   2.1. Requisitos del proyecto
+   2.2. Casos de uso
+   2.3. Elementos de hardware
+3. Diseño e implementación
+   3.1. Esquema eléctrico y conexionado
+   3.2. Descripción del comportamiento (Máquina de Estados)
+   3.3. Arquitectura del firmware
+4. Ensayos y resultados
+5. Conclusiones
+6. Bibliografía
+
+---
+
+## 1. Introducción general
+
+### 1.1. Objetivo del trabajo
+
+El objetivo del proyecto es diseñar e implementar el firmware y el hardware de una maqueta de ascensor de 3 paradas, aplicando los contenidos fundamentales del Taller de Sistemas Embebidos: programación Bare Metal orientada a eventos, máquinas de estado, manejo de periféricos por polling/interrupciones/DMA, buses I2C y SPI, persistencia de configuración, modos de bajo consumo, y una interfaz de usuario mediante menú interactivo.
+
+### 1.2. Motivación y análisis de mercado
+
+> **[BORRADOR — reemplazar por texto propio antes de la entrega final]**
+>
+> Elegimos este proyecto porque combina, en un solo sistema, prácticamente todos los ejes centrales de la materia: una máquina de estados no trivial (con siete estados y transiciones de prioridad como emergencia y falla), múltiples periféricos con protocolos distintos (SPI para RFID, I2C para el LCD, un protocolo propio de dos hilos para la celda de carga, UART para Bluetooth), persistencia en Flash, y requisitos de tiempo real blando (el super-loop debe completarse en menos de 1ms). Además, el control de acceso por RFID y el bajo consumo agregan una capa de "producto" al proyecto: no es solo una maqueta que sube y baja, sino un sistema pensado para un caso de uso realista (un edificio con acceso restringido).
+>
+> A diferencia de los kits educativos de ascensores en miniatura disponibles comercialmente (que suelen ser de código cerrado y sin posibilidad de personalización), este proyecto propone un desarrollo abierto donde cada aspecto —desde el control de acceso por RFID hasta el bajo consumo— es diseñado e implementado por el equipo.
+
+## 2. Introducción específica
+
+### 2.1. Requisitos del proyecto
+
+En la Tabla 2.1 se detallan los principales requisitos funcionales del sistema:
+
+| Grupo | ID | Descripción |
+|---|---|---|
+| Movimiento | 1.1 | El sistema desplazará la cabina entre 3 paradas: Planta Baja, Piso 1 y Piso 2. |
+| | 1.2 | El sistema detectará la llegada a cada piso mediante un sensor reed switch dedicado. |
+| | 1.3 | El sistema controlará la velocidad del motor mediante PWM. |
+| | 1.4 | Si el viaje excede un tiempo máximo sin detectar llegada, el sistema pasará a estado de FALLA. |
+| Llamado de piso | 2.1 | El sistema permitirá solicitar un piso mediante botonera externa (en cada piso) e interna (en la cabina). |
+| | 2.2 | El sistema encolará pedidos pendientes si se solicitan mientras el ascensor está en movimiento. |
+| Puerta | 3.1 | El sistema abrirá la puerta automáticamente al llegar a un piso. |
+| | 3.2 | El sistema cerrará la puerta automáticamente tras un tiempo configurable de espera. |
+| | 3.3 | El sistema verificará el cierre de puerta mediante sensor reed switch antes de iniciar un viaje. |
+| Seguridad | 4.1 | El sistema detendrá el ascensor y abrirá la puerta ante la activación del interruptor de emergencia (Dip Switch, posición SW1). |
+| | 4.2 | El sistema detectará sobrecarga mediante celda de carga y bloqueará nuevos viajes mientras esté activa. |
+| | 4.3 | El sistema emitirá señales sonoras distintivas para llegada, tecla, sobrecarga, emergencia y falla. |
+| Control de acceso | 5.1 | El sistema leerá el UID de tarjetas RFID mediante el módulo RC522. |
+| | 5.2 | El sistema podrá restringir el llamado de piso a tarjetas autorizadas (configurable). |
+| Interfaz de usuario | 6.1 | El sistema mostrará el piso actual y el estado del ascensor en un display LCD 16x2 por I2C. |
+| | 6.2 | El sistema indicará mediante LEDs el estado de movimiento, puerta, SET_UP, falla y emergencia. |
+| | 6.3 | El sistema permitirá control remoto (llamado de piso) mediante Bluetooth (HM-10). |
+| Configuración (SET_UP) | 7.1 | El sistema contará con un modo SET_UP con menú interactivo por LCD y botones. |
+| | 7.2 | El sistema permitirá configurar y persistir: tiempo de puerta abierta, umbral de sobrecarga y velocidad del motor. |
+| | 7.3 | La configuración persistirá en Flash interna del microcontrolador entre reinicios. |
+| Arquitectura de software | 8.1 | El sistema se implementará Bare Metal, sin sistema operativo, bajo el paradigma Event-Triggered. |
+| | 8.2 | El sistema utilizará un Ejecutor Cíclico (Super-Loop) con una vuelta completa menor a 1ms. |
+| | 8.3 | El sistema utilizará una base de tiempo de 1ms (SysTick → Callback) para todas las temporizaciones. |
+| | 8.4 | Todas las tareas serán no bloqueantes (temporizadas o no temporizadas), sin uso de `HAL_Delay()` en la lógica de aplicación. |
+| | 8.5 | El sistema implementará un modo de bajo consumo cuando el ascensor permanezca IDLE sin pedidos pendientes, saliendo de éste ante cualquier evento (botón, RFID, Bluetooth). |
+| Modo físico | 9.1 | El sistema implementará el interruptor de emergencia y la habilitación por hardware del control de acceso RFID mediante un Dip Switch de 2 posiciones. |
+
+<p align="center"><em>Tabla 2.1: Requisitos del proyecto.</em></p>
+
+### 2.2. Casos de uso
+
+#### 2.2.1. Caso de uso 1: Un usuario llama al ascensor desde un piso
+
+| Elemento | Definición |
+|---|---|
+| Disparador | Un usuario presiona el botón externo de llamado en Planta Baja, Piso 1 o Piso 2. |
+| Precondiciones | El sistema está en modo NORMAL, en estado IDLE (o con otro pedido pendiente), sin sobrecarga activa. |
+| Flujo principal | El botón genera un evento de pedido de piso, que se encola en la lista de pedidos pendientes. Si el ascensor está en IDLE, cierra la puerta (si estaba abierta), viaja al piso solicitado controlando el motor por PWM, detiene el motor al detectar el reed switch del piso destino, y abre la puerta automáticamente. |
+
+<p align="center"><em>Tabla 2.2: Caso de uso 1.</em></p>
+
+#### 2.2.2. Caso de uso 2: Se activa el interruptor de emergencia durante un viaje
+
+| Elemento | Definición |
+|---|---|
+| Disparador | El usuario activa la posición SW1 (emergencia) del Dip Switch mientras el ascensor está en movimiento. |
+| Precondiciones | El sistema está en cualquier estado que no sea ya EMERGENCIA. |
+| Flujo principal | El sistema detiene el motor de inmediato, abre la puerta, enciende el LED de emergencia, activa el buzzer en patrón continuo y muestra el aviso en el LCD, independientemente del estado en el que se encontraba. El sistema permanece en este estado hasta que SW1 vuelve a su posición normal (comportamiento mantenido, no momentáneo). |
+
+<p align="center"><em>Tabla 2.3: Caso de uso 2.</em></p>
+
+#### 2.2.3. Caso de uso 3: Un usuario configura los parámetros del sistema (modo SET_UP)
+
+| Elemento | Definición |
+|---|---|
+| Disparador | El usuario mantiene presionado el botón interno de Planta Baja durante el encendido del sistema. |
+| Precondiciones | El sistema está apagado o acaba de reiniciarse. |
+| Flujo principal | El sistema arranca en modo SET_UP en lugar de NORMAL. El usuario navega entre los parámetros configurables (tiempo de puerta, umbral de sobrecarga, velocidad de motor) usando el botón de Planta Baja como "navegar" y el de Piso 2 como "incrementar valor". Al llegar a la opción "Guardar y salir" y confirmar (activando momentáneamente SW1, la posición de emergencia del Dip Switch, que en este modo se reutiliza como tecla de confirmación), el sistema persiste los valores en Flash interna y puede reiniciarse en modo NORMAL. |
+
+<p align="center"><em>Tabla 2.4: Caso de uso 3.</em></p>
+
+#### 2.2.4. Caso de uso 4: Control de acceso mediante tarjeta RFID
+
+| Elemento | Definición |
+|---|---|
+| Disparador | El usuario acerca una tarjeta/llavero RFID al módulo RC522. |
+| Precondiciones | El sistema tiene habilitado el control de acceso, tanto por software (`ACCESO_RFID_REQUERIDO = 1`) como por hardware (Dip Switch en posición ON). |
+| Flujo principal | El sistema lee el UID de la tarjeta mediante el protocolo REQA + anticolisión sobre SPI. Si el UID coincide con la lista de tarjetas autorizadas, se habilita el llamado de piso; caso contrario, se rechaza el pedido y se indica mediante LCD/buzzer. |
+
+<p align="center"><em>Tabla 2.5: Caso de uso 4.</em></p>
+
+#### 2.2.5. Caso de uso 5: El sistema entra en bajo consumo
+
+| Elemento | Definición |
+|---|---|
+| Disparador | El ascensor permanece en estado IDLE, sin pedidos pendientes, durante un tiempo configurable. |
+| Precondiciones | El sistema está en modo NORMAL, sin sobrecarga ni emergencia activas. |
+| Flujo principal | El sistema apaga periféricos no esenciales (LCD, buzzer), detiene el polling de alta frecuencia, y entra en modo STOP del microcontrolador. Ante cualquier evento habilitado como fuente de wake-up (botón, reed switch, Dip Switch (emergencia), RFID vía interrupción, o dato entrante por Bluetooth), el sistema despierta, reconfigura el reloj y reanuda el super-loop normalmente. |
+
+<p align="center"><em>Tabla 2.6: Caso de uso 5.</em></p>
+
+### 2.3. Elementos de hardware
+
+#### 2.3.1. Placa de desarrollo
+
+Como unidad central de procesamiento se utilizó la placa **STM32 Nucleo-F446RE**, compatible con el ecosistema HAL/CubeMX. Gestiona toda la lógica del ascensor mediante una máquina de estados, el manejo de tiempos críticos mediante SysTick y TIM2 (PWM), y la comunicación con los periféricos mediante I2C1, SPI1 y USART3.
+
+#### 2.3.2. Motor y driver L298N
+
+Se utilizó un motorreductor DC de 12V acoplado a una polea para el sistema de tracción de la cabina, controlado a través de un driver **L298N** (puente H). La dirección de giro se controla mediante los pines IN1/IN2 (GPIO), y la velocidad mediante PWM sobre el pin ENA (TIM2_CH1).
+
+
+#### 2.3.3. Celda de carga + HX711
+
+Para la detección de sobrecarga se utilizó una celda de carga tipo barra recta de 3kg, junto al amplificador **HX711**, que entrega el dato mediante un protocolo propio de 2 hilos (DT/SCK).
+
+
+#### 2.3.4. Display LCD 16x2 (I2C)
+
+Se utilizó un display LCD 16x2 con backpack I2C (PCF8574), que muestra el piso actual, el estado del ascensor y el menú de configuración (SET_UP).
+
+
+#### 2.3.5. Módulo RFID RC522 (SPI)
+
+Se integró un módulo lector RFID **RC522** por SPI1, utilizado para el control de acceso opcional mediante tarjetas/llaveros.
+
+
+#### 2.3.6. Módulo Bluetooth HM-10 (UART)
+
+Se utilizó un módulo HM-10 (Bluetooth Low Energy) sobre USART3 para permitir el llamado de piso de forma remota desde una aplicación de celular.
+
+
+#### 2.3.7. Botones y reed switches
+
+Se utilizaron 6 pulsadores (3 botoneras externas de piso + 3 botoneras de cabina) y 3 sensores reed switch (uno por piso, para detección de llegada). La función de interruptor de emergencia, antes cubierta por una llave tipo switch mantenido, fue reemplazada por una posición del Dip Switch (ver sección 2.3.9).
+
+
+#### 2.3.8. LEDs y buzzer
+
+Se utilizaron 3 LEDs indicadores de piso y un buzzer activo para señalización sonora de eventos (llegada, tecla, sobrecarga, emergencia, falla).
+
+
+#### 2.3.9. Dip Switch
+
+Se incorporó un Dip Switch de 2 posiciones que reemplaza a la llave de emergencia física y además permite seleccionar configuración por hardware, independiente del modo SET_UP por software:
+
+- **SW1 — Interruptor de emergencia**: reemplaza a la llave de emergencia tipo switch mantenido. Cualquier transición de este switch a la posición de emergencia interrumpe el estado actual de la FSM (con prioridad absoluta sobre cualquier otro evento, incluyendo BAJO_CONSUMO) y lleva al sistema a EMERGENCIA. El sistema permanece en EMERGENCIA hasta que SW1 vuelve a su posición normal. Este mismo switch se reutiliza como tecla de confirmación dentro del menú SET_UP (ver caso de uso 3).
+- **SW2 — Habilitación de control de acceso RFID por hardware**: actúa como un enable físico adicional al flag `ACCESO_RFID_REQUERIDO` persistido en Flash. Permite deshabilitar el control de acceso de forma inmediata (por ejemplo, durante pruebas o demostraciones) sin tener que entrar al menú SET_UP.
+
+El estado de ambas posiciones se lee por polling en la etapa de Escrutar, igual que el resto de las entradas digitales. A diferencia de los demás botones (que generan eventos de flanco), SW1 se trata como una entrada de nivel: mientras se mantenga en la posición de emergencia, el sistema permanece en ese estado.
+
+
+## 3. Diseño e implementación
+
+### 3.1. Esquema eléctrico y conexionado
+
+Para la integración física del sistema se utilizó una placa experimental soldada (sin protoboard ni cables Dupont), con interconexión de componentes mediante cables soldados. El circuito se centra en la placa Nucleo-F103,que gestiona los periféricos mediante las siguientes interfaces:
+
+- GPIO (entradas): botones de llamado externo/interno, reed switches de piso, Dip Switch (emergencia + habilitación RFID).
+- GPIO (salidas): LEDs indicadores, buzzer, direccionamiento del motor (IN1/IN2).
+- PWM (TIM2_CH1): control de velocidad del motor a través de ENA del L298N.
+- I2C1 (PB8=SCL, PB9=SDA): display LCD.
+- SPI1 (PA5=SCK, PA6=MISO, PA7=MOSI): módulo RFID RC522.
+- USART3 (PB10=TX, PB11=RX): módulo Bluetooth HM-10.
+- 2 hilos bit-banged (PC4=DT, PC5=SCK): amplificador de celda de carga HX711.
+
+En la Tabla 3.1 se detalla la asignación completa de pines:
+
+| Bloque | Señal | Pin STM32 | Configuración |
+|---|---|---|---|
+| Reed switches | PB / P1 / P2 | PC6 / PC7 / PC8 | GPIO_Input |
+| Botones externos | PB / P1 / P2 | PC9 / PC10 / PC11 | GPIO_Input |
+| Botonera de cabina | PB / P1 / P2 | PC12 / PB1 / PB2 | GPIO_Input |
+| Dip Switch | SW1 (emergencia) / SW2 (RFID hw) | PB12 / PA15 | GPIO_Input |
+| LEDs de piso | PB / P1 / P2 | PB3 / PB4 / PB5 | GPIO_Output |
+| Buzzer | — | PB13 | GPIO_Output |
+| Motor L298N | IN1 / IN2 | PC0 / PC1 | GPIO_Output |
+| Motor L298N | ENA | PA0 | TIM2_CH1 (PWM) |
+| LCD | I2C1 SCL / SDA | PB8 / PB9 | I2C1 |
+| RC522 | SPI1 SCK / MISO / MOSI | PA5 / PA6 / PA7 | SPI1 |
+| RC522 | RST / CS | PA9 / PB6 | GPIO_Output |
+| HX711 | DT / SCK | PC4 / PC5 | GPIO_Input / GPIO_Output |
+| HM-10 | USART3 TX / RX | PB10 / PB11 | USART3 |
+
+<p align="center"><em>Tabla 3.1: Asignación de pines del sistema.</em></p>
+
+> Nota: SW1 reutiliza el pin PB12 originalmente cableado para la llave de emergencia (el reemplazo es un cambio de componente, no de conexionado). El pin PA15 propuesto para SW2 es un punto de partida; verificar que no colisione con otras funciones alternativas usadas en el proyecto antes de soldar.
+
+### 3.2. Descripción del comportamiento (Máquina de Estados)
+
+El comportamiento del ascensor se modela mediante una máquina de estados finitos con los siguientes estados: IDLE, PUERTA_ABRIENDO, PUERTA_ABIERTA, PUERTA_CERRANDO, VIAJANDO, EMERGENCIA, FALLA y BAJO_CONSUMO.
+
+Desde IDLE, ante un pedido de piso pendiente, el sistema transiciona a PUERTA_CERRANDO (asegurando el cierre antes de cualquier viaje). Al confirmarse el cierre por el reed switch de puerta, se pasa a VIAJANDO, activando el motor en la dirección correspondiente (subiendo o bajando según el piso destino) y armando un temporizador de viaje (watchdog). Al detectar la llegada al piso destino mediante el reed switch correspondiente, se detiene el motor y se transiciona a PUERTA_ABRIENDO y luego a PUERTA_ABIERTA, donde permanece durante un tiempo configurable antes de volver a cerrar.
+
+Si el sistema permanece en IDLE sin pedidos pendientes durante un tiempo configurable, transiciona a BAJO_CONSUMO, apagando periféricos no esenciales y suspendiendo el CPU en modo STOP. Cualquier evento de entrada habilitado como fuente de interrupción lo saca de este estado y lo devuelve a IDLE.
+
+Los estados EMERGENCIA y FALLA tienen prioridad absoluta: cualquier activación del interruptor de emergencia (Dip Switch, SW1) interrumpe el estado actual (sin importar cuál sea, incluyendo BAJO_CONSUMO) y lleva al sistema a EMERGENCIA. El estado FALLA se alcanza si el temporizador de viaje vence sin detectar llegada (posible reed switch desalineado o motor trabado).
+
+
+### 3.3. Arquitectura del firmware
+
+El firmware se estructura en las etapas Escrutar → Procesar → Actuar, comunicadas mediante una cola de eventos, sobre un Ejecutor Cíclico con tick de 1ms. Ningún módulo utiliza `HAL_Delay()` en su lógica de operación regular.
+
+#### 3.3.1. Módulo Tick
+
+Provee la base de tiempo de 1ms mediante el callback de SysTick (`HAL_SYSTICK_Callback`), y una utilidad de temporizador no bloqueante (`temporizador_t`) usada por todos los demás módulos para medir tiempos sin bloquear el super-loop.
+
+#### 3.3.2. Módulo Eventos
+
+Implementa una cola FIFO circular (array de estructuras) que desacopla la etapa de Escrutar de la etapa de Procesar. Cualquier fuente de entrada (botón físico, comando Bluetooth, sensor) empuja el mismo tipo de evento, permitiendo que la máquina de estados no distinga el origen.
+
+#### 3.3.3. Módulo Escrutar
+
+Realiza el polling con antirrebote por software de los 6 botones, 3 reed switches y el Dip Switch (SW1 emergencia, SW2 habilitación RFID), y el polling de la celda de carga (HX711), generando eventos ante cada cambio de estado relevante.
+
+#### 3.3.4. Módulo FSM Ascensor
+
+Implementa la máquina de estados descrita en la sección 3.2, incluyendo la lista de pedidos pendientes por piso, la lógica de selección del próximo destino, y la transición hacia/desde BAJO_CONSUMO.
+
+#### 3.3.5. Módulo Actuadores
+
+Conjunto de drivers de bajo nivel para motor (PWM + dirección), LEDs, buzzer (con patrones no bloqueantes) y LCD (I2C).
+
+#### 3.3.6. Módulo Configuración (Flash interna)
+
+Persiste los parámetros configurables (tiempo de puerta, umbral de sobrecarga, velocidad de motor) en un sector de Flash interna del STM32F446RE, con verificación por checksum ante lecturas de sectores no inicializados.
+
+#### 3.3.7. Módulo RFID (RC522)
+
+Implementa la inicialización del chip MFRC522 y la lectura de UID mediante REQA + anticolisión de nivel 1 sobre SPI1, comparando contra una lista de UIDs autorizados.
+
+#### 3.3.8. Módulo Bluetooth (HM-10)
+
+Recepción de comandos por USART3 mediante interrupción (no polling bloqueante), permitiendo el llamado de piso remoto desde una aplicación de celular.
+
+#### 3.3.9. Módulo Bajo Consumo
+
+Gestiona la entrada y salida del modo STOP del microcontrolador mediante `HAL_PWR_EnterSTOPMode()`, condicionada a que la FSM se encuentre en IDLE sin pedidos pendientes durante un tiempo configurable. Antes de dormir, configura las líneas de GPIO relevantes (botones, reed switches, Dip Switch, RX de USART3) como fuentes de interrupción externa (EXTI) para el despertar, y al retornar reconfigura el reloj del sistema (dado que el STOP mode detiene el PLL) antes de reanudar el super-loop.
