@@ -1,4 +1,4 @@
-# Ascensor Inteligente
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/7354d3bd-3040-48af-ba8d-469d4e212efb" /># Ascensor Inteligente
 
 **Autores:** Uma Toscan, Mariana Dos Reis, Felipe Colodro  
 **Padrones:** 111106, 111545, 106433
@@ -83,6 +83,7 @@ En la Figura 1.3.1 (representada conceptualmente en la Tabla 1.3.1) se muestra e
 * **Control de movimiento (PWM):**
   * Driver de motor (regula la potencia y dirección del motor según las órdenes del microcontrolador).
   * Motor principal del ascensor (ejecuta el movimiento vertical entre pisos).
+<img width="2816" height="1536" alt="diagrama_bloques png" src="https://github.com/user-attachments/assets/9c4e5405-73cf-48bd-98bb-526ab9e38c8a" />
 
 ---
 
@@ -91,10 +92,11 @@ En la Figura 1.3.1 (representada conceptualmente en la Tabla 1.3.1) se muestra e
 En Argentina existen varias empresas que ofrecen sistemas de ascensores con distintos niveles de automatización y seguridad. Aunque estos productos están orientados a uso comercial y residencial, ninguno coincide exactamente con el alcance del proyecto que estamos desarrollando, que busca una solución funcional y simplificada.
 
 Un primer competidor es **Ascensores Cóndor**, que fabrica y mantiene ascensores electromecánicos en Buenos Aires. Sus sistemas incluyen botoneras digitales y control de puertas, pero no integran pantallas LCD para mostrar información detallada al usuario. Nuestro proyecto se diferencia al incorporar un display que mejora la interacción y la claridad de uso.
-
+Link: http://www.ascensorescondor.com/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGn13lDuAVi5dhtuCId50eIghyUosBH8x_WjyTWoXNa4tBrylbSO9jZsuktf2E_aem_K109Uy7iHPtJeuCJ0ARY3A
+      https://www.instagram.com/ascensores_condor/?hl=es
+      
 Un segundo competidor es **Servas Ascensores**, que ofrece ascensores con sistemas de seguridad redundantes y control electrónico. Aunque robustos, sus soluciones están pensadas para edificios completos y requieren infraestructura más compleja. El proyecto propuesto busca replicar algunas funciones básicas de seguridad (sensores de puerta y sobrecarga) en una versión más acotada y accesible.
-
-Finalmente, **Electra Ascensores**, también presente en Argentina, incorpora sistemas digitales y pantallas informativas en cabina, pero su implementación es comercial y de alto costo. El proyecto se inspira en esa funcionalidad, pero la adapta a un prototipo simplificado con LCD y lógica de control en microcontrolador.
+Link: https://landings.servas.com/?gad_source=1&gad_campaignid=23556090406&gbraid=0AAAABAiMmx_r5K5Qgpvc2ypYbnrdzSi9z&gclid=CjwKCAjw9szSBhBNEiwAC57Sq1DYON-RB880T5N8EgbA_3afA47-h3za1OiGujXkOTeRapGGny0F2xoCv-YQAvD_BwE
 
 En resumen, el mercado argentino ofrece soluciones profesionales, pero el *Ascensor Inteligente* se posiciona como una alternativa realista y simplificada, que integra seguridad, control de movimiento y comunicación visual sin requerir infraestructura compleja.
 
