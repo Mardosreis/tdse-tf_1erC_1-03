@@ -1,4 +1,4 @@
-<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/7354d3bd-3040-48af-ba8d-469d4e212efb" /># Ascensor Inteligente
+# Ascensor Inteligente
 
 **Autores:** Uma Toscan, Mariana Dos Reis, Felipe Colodro  
 **Padrones:** 111106, 111545, 106433
