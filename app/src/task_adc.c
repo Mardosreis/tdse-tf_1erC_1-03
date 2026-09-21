@@ -29,82 +29,81 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @file   : app.h
+ * @file   : task_adc.c
  * @date   : Set 26, 2023
  * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
  * @version	v1.0.0
  */
 
-#ifndef APP_INC_APP_H_
-#define APP_INC_APP_H_
-
-/********************** CPP guard ********************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /********************** inclusions *******************************************/
-#include <stdbool.h>
-#include <stdint.h>
+/* Project includes. */
+#include "main.h"
 
-/********************** macros ***********************************************/
+/* Demo includes. */
+#include "logger.h"
+#include "dwt.h"
 
-#define TEST_0 (0)
-#define TEST_1 (1)
-#define TEST_2 (2)
+/* Application & Tasks includes. */
+#include "task_adc.h"
+#include "board.h"
+#include "app.h"
 
-#define TEST_X (TEST_0)
-
-/********************** typedef **********************************************/
-
-// Definimos los estados posibles del ascensor
-typedef enum {
-    ESTADO_ESPERANDO_LLAVE,
-	ESTADO_SET_UP,
-    ESTADO_ESPERANDO_BOTON,
-    ESTADO_MOVIENDO,
-    ESTADO_SOBRECARGA,
-	ESTADO_EMERGENCIA
-} estado_ascensor_t;
-
-// Estructura de datos compartida unificada
-typedef struct {
-    // Entradas y sensores
-    bool tarjeta_leida;
-    int32_t peso_actual;
-    float peso_kg;
-    bool boton_piso_presionado;
+/********************** macros and definitions *******************************/
 
 
-    // Estado Central de la Máquina de Estados
-    estado_ascensor_t estado_actual;
-
-    // Datos heredados de los TP anteriores
-    bool adc_end_of_conversion;
-    uint16_t adc_value;
-    bool pwm_active;
-    bool flag_tarar;
+/********************** internal data declaration ****************************/
 
 
-        uint8_t piso_actual;
-        uint8_t piso_destino;
-        uint8_t timer_tara;
+/********************** internal functions declaration ***********************/
+HAL_StatusTypeDef ADC_Poll_Read(uint16_t *value);
 
-    } shared_data_type;
+/********************** internal data definition *****************************/
+const char *p_task_adc 		= "Task ADC";
 
+/********************** external data declaration *****************************/
 
-/********************** external data declaration ****************************/
+extern ADC_HandleTypeDef hadc1;
 
-/********************** external functions declaration ***********************/
+/********************** external functions definition ************************/
+void task_adc_init(void *parameters)
+{
+	shared_data_type *shared_data = (shared_data_type *) parameters;
 
-void app_init(void);
-void app_update(void);
+	/* Print out: Task Initialized */
+	LOGGER_LOG("  %s is running - %s\r\n", GET_NAME(task_adc_init), p_task_adc);
 
-/********************** End of CPP guard *************************************/
-#ifdef __cplusplus
+	shared_data->adc_end_of_conversion = false;
 }
-#endif
 
-#endif /* APP_INC_APP_H_ */
+void task_adc_update(void *parameters)
+{
+
+	shared_data_type *shared_data = (shared_data_type *) parameters;
+
+	if (HAL_OK==ADC_Poll_Read(&shared_data->adc_value)) {
+		shared_data->adc_end_of_conversion = true;
+	}
+	else {
+		LOGGER_LOG("error\n");
+	}
+}
+
+
+
+//	Requests start of conversion, waits until conversion done
+HAL_StatusTypeDef ADC_Poll_Read(uint16_t *value) {
+	HAL_StatusTypeDef res;
+
+	res=HAL_ADC_Start(&hadc1);
+	if ( HAL_OK==res ) {
+		res=HAL_ADC_PollForConversion(&hadc1, 0);
+		if ( HAL_OK==res ) {
+			*value = HAL_ADC_GetValue(&hadc1);
+		}
+	}
+	return res;
+}
+
+
 
 /********************** end of file ******************************************/

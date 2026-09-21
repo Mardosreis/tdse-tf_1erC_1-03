@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Sebastian Bedin <sebabedin@gmail.com>.
+ * Copyright (c) 2023 Sebastian Bedin <sebabedin@gmail.com>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,10 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
+ *
+ * @file   : logger.c
  * @author : Sebastian Bedin <sebabedin@gmail.com>
+ * @version	v1.0.0
  */
 
 /********************** inclusions *******************************************/
@@ -53,11 +56,9 @@
 
 /********************** external data definition *****************************/
 
-#if 1 == LOGGER_CONFIG_ENABLE
 static char logger_msg_buffer_[LOGGER_CONFIG_MAXLEN];
 char* const logger_msg = logger_msg_buffer_;
 int logger_msg_len;
-#endif
 
 /********************** internal functions definition ************************/
 

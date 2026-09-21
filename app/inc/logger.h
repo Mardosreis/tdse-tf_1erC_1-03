@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Sebastian Bedin <sebabedin@gmail.com>.
+ * Copyright (c) 2023 Sebastian Bedin <sebabedin@gmail.com>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,11 +29,13 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
+ * @file   : logger.h
  * @author : Sebastian Bedin <sebabedin@gmail.com>
+ * @version	v1.0.0
  */
 
-#ifndef LOGGER_H_
-#define LOGGER_H_
+#ifndef INC_LOGGER_H_
+#define INC_LOGGER_H_
 
 /********************** CPP guard ********************************************/
 #ifdef __cplusplus
@@ -65,20 +67,6 @@ extern "C" {
 #define LOGGER_LOG(...)
 #endif
 
-#if 1 == LOGGER_CONFIG_ENABLE
-#define LOGGER_INFO(...)\
-	__asm("CPSID i");	/* disable interrupts*/\
-	{\
-		logger_log_print_("[info] ");\
-    	logger_msg_len = snprintf(logger_msg, (LOGGER_CONFIG_MAXLEN - 1), __VA_ARGS__);\
-    	logger_log_print_(logger_msg);\
-    	logger_log_print_("\n");\
-	}\
-	__asm("CPSIE i");	/* enable interrupts*/
-#else
-#define LOGGER_INFO(...)
-#endif
-
 #define GET_NAME(var)  #var
 
 /********************** typedef **********************************************/
@@ -95,6 +83,6 @@ void logger_log_print_(char* const msg);
 }
 #endif
 
-#endif /* LOGGER_H_ */
+#endif /* INC_LOGGER_H_ */
 
 /********************** end of file ******************************************/

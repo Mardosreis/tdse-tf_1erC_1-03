@@ -29,14 +29,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @file   : app.h
+ * @file   : task_adc.h
  * @date   : Set 26, 2023
  * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
  * @version	v1.0.0
  */
 
-#ifndef APP_INC_APP_H_
-#define APP_INC_APP_H_
+#ifndef TASK_INC_TASK_ADC_H_
+#define TASK_INC_TASK_ADC_H_
 
 /********************** CPP guard ********************************************/
 #ifdef __cplusplus
@@ -44,67 +44,24 @@ extern "C" {
 #endif
 
 /********************** inclusions *******************************************/
-#include <stdbool.h>
 #include <stdint.h>
 
 /********************** macros ***********************************************/
 
-#define TEST_0 (0)
-#define TEST_1 (1)
-#define TEST_2 (2)
-
-#define TEST_X (TEST_0)
-
 /********************** typedef **********************************************/
 
-// Definimos los estados posibles del ascensor
-typedef enum {
-    ESTADO_ESPERANDO_LLAVE,
-	ESTADO_SET_UP,
-    ESTADO_ESPERANDO_BOTON,
-    ESTADO_MOVIENDO,
-    ESTADO_SOBRECARGA,
-	ESTADO_EMERGENCIA
-} estado_ascensor_t;
-
-// Estructura de datos compartida unificada
-typedef struct {
-    // Entradas y sensores
-    bool tarjeta_leida;
-    int32_t peso_actual;
-    float peso_kg;
-    bool boton_piso_presionado;
-
-
-    // Estado Central de la Máquina de Estados
-    estado_ascensor_t estado_actual;
-
-    // Datos heredados de los TP anteriores
-    bool adc_end_of_conversion;
-    uint16_t adc_value;
-    bool pwm_active;
-    bool flag_tarar;
-
-
-        uint8_t piso_actual;
-        uint8_t piso_destino;
-        uint8_t timer_tara;
-
-    } shared_data_type;
-
-
 /********************** external data declaration ****************************/
+extern uint32_t g_task_a_cnt;
 
 /********************** external functions declaration ***********************/
-
-void app_init(void);
-void app_update(void);
+void task_adc_init(void *parameters);
+void task_adc_update(void *parameters);
 
 /********************** End of CPP guard *************************************/
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* APP_INC_APP_H_ */
+#endif /* TASK_INC_TASK_ADC_H_ */
 
 /********************** end of file ******************************************/

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>.
+ * Copyright (c) 2023 Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,11 +29,14 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
+ * @file   : dwt.h
+ * @date   : Set 26, 2023
  * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
+ * @version	v1.0.0
  */
 
-#ifndef DWT_H_
-#define DWT_H_
+#ifndef DWT_INC_DWT_H_
+#define DWT_INC_DWT_H_
 
 /********************** CPP guard ********************************************/
 #ifdef __cplusplus
@@ -50,51 +53,29 @@ extern "C" {
 /*!< TRCENA: Enable trace and debug block DEMCR (Debug Exception and Monitor Control Register) */
 /*!< DWT Cycle Counter register */
 /*!< CYCCNTENA bit in DWT_CONTROL register */
-static inline void cycle_counter_init(void) __attribute__((always_inline));
-static inline void cycle_counter_init(void)
-{
-	 CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;/* enable DWT hardware */
-	 DWT->CYCCNT = 0;								/* reset cycle counter */
-	 DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;			/* start counting */
-}
+#define cycle_counter_init() ({\
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;	/* enable DWT hardware */\
+	DWT->CYCCNT = 0;								/* reset cycle counter */\
+	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;			/* start counting */\
+ 	})
 
 /* reset cycle counter */
 /*!< DWT Cycle Counter register */
-static inline void cycle_counter_reset(void) __attribute__((always_inline));
-static inline void cycle_counter_reset(void)
-{
-	DWT->CYCCNT = 0;
-}
+#define cycle_counter_reset() (DWT->CYCCNT = 0)
 
-/* enable counting */
+/* start counting */
 /*!< CYCCNTENA bit in DWT_CONTROL register */
-static inline void cycle_counter_enable(void) __attribute__((always_inline));
-static inline void cycle_counter_enable(void)
-{
-	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-}
+#define cycle_counter_enable() (DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk)
 
-/* disable counting */
+/* disable counting if not used any more */
 /*!< CYCCNTENA bit in DWT_CONTROL register */
-static inline void cycle_counter_disable(void) __attribute__((always_inline));
-static inline void cycle_counter_disable(void)
-{
-	DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;
-}
+#define cycle_counter_disable() (~DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk)
 
 /* read cycle counter */
 /*!< DWT Cycle Counter register */
-static inline uint32_t cycle_counter_get(void) __attribute__((always_inline));
-static inline uint32_t cycle_counter_get(void)
-{
-	return (DWT->CYCCNT);
-}
-
-static inline uint32_t cycle_counter_get_time_us(void) __attribute__((always_inline));
-static inline uint32_t cycle_counter_get_time_us(void)
-{
-	return (DWT->CYCCNT / (SystemCoreClock / 1000000));
-}
+#define cycle_counter_get() (DWT->CYCCNT)
+#define cycles_per_us (SystemCoreClock / 1000000)
+#define cycle_counter_time_us() (DWT->CYCCNT / cycles_per_us)
 
 /*  uint32_t cycle_counter = 0;
  *  uint32_t cycle_counter_time_us = 0;
@@ -112,7 +93,7 @@ static inline uint32_t cycle_counter_get_time_us(void)
  *  ...														// =>
  *
  *  cycle_counter = cycle_counter_get();
- *  cycle_counter_time_us = cycle_counter_get_time_us();	//	  __
+ *  cycle_counter_time_us = cycle_counter_time_us();		//	  __
  *  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_RESET);	// =>   \___
  *  // or => HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
  *
@@ -120,6 +101,8 @@ static inline uint32_t cycle_counter_get_time_us(void)
  *
  *  LOGGER_LOG("Cycles: %lu - Time %lu uS\r\n", cycle_counter, cycle_counter_time_us);
  */
+
+/********************** macros ***********************************************/
 
 /********************** typedef **********************************************/
 
@@ -132,6 +115,6 @@ static inline uint32_t cycle_counter_get_time_us(void)
 }
 #endif
 
-#endif /* DWT_H_ */
+#endif /* DWT_INC_DWT_H_ */
 
 /********************** end of file ******************************************/

@@ -29,82 +29,47 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @file   : app.h
+ * @file   : task_dummy.c
  * @date   : Set 26, 2023
  * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
  * @version	v1.0.0
  */
 
-#ifndef APP_INC_APP_H_
-#define APP_INC_APP_H_
-
-/********************** CPP guard ********************************************/
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /********************** inclusions *******************************************/
-#include <stdbool.h>
-#include <stdint.h>
+/* Project includes. */
+#include "main.h"
 
-/********************** macros ***********************************************/
+/* Demo includes. */
+#include "logger.h"
+#include "dwt.h"
 
-#define TEST_0 (0)
-#define TEST_1 (1)
-#define TEST_2 (2)
+/* Application & Tasks includes. */
+#include "board.h"
+#include "app.h"
 
-#define TEST_X (TEST_0)
+/********************** macros and definitions *******************************/
 
-/********************** typedef **********************************************/
+/********************** internal data declaration ****************************/
 
-// Definimos los estados posibles del ascensor
-typedef enum {
-    ESTADO_ESPERANDO_LLAVE,
-	ESTADO_SET_UP,
-    ESTADO_ESPERANDO_BOTON,
-    ESTADO_MOVIENDO,
-    ESTADO_SOBRECARGA,
-	ESTADO_EMERGENCIA
-} estado_ascensor_t;
+/********************** internal functions declaration ***********************/
 
-// Estructura de datos compartida unificada
-typedef struct {
-    // Entradas y sensores
-    bool tarjeta_leida;
-    int32_t peso_actual;
-    float peso_kg;
-    bool boton_piso_presionado;
+/********************** internal data definition *****************************/
+const char *p_task_dummy 		= "Task Dummy";
+
+/********************** external data declaration *****************************/
 
 
-    // Estado Central de la Máquina de Estados
-    estado_ascensor_t estado_actual;
+/********************** external functions definition ************************/
+void task_dummy_init(void *parameters)
+{
+	/* Print out: Task Initialized */
+	LOGGER_LOG("  %s is running - %s\r\n", GET_NAME(task_c_init), p_task_dummy);
 
-    // Datos heredados de los TP anteriores
-    bool adc_end_of_conversion;
-    uint16_t adc_value;
-    bool pwm_active;
-    bool flag_tarar;
-
-
-        uint8_t piso_actual;
-        uint8_t piso_destino;
-        uint8_t timer_tara;
-
-    } shared_data_type;
-
-
-/********************** external data declaration ****************************/
-
-/********************** external functions declaration ***********************/
-
-void app_init(void);
-void app_update(void);
-
-/********************** End of CPP guard *************************************/
-#ifdef __cplusplus
 }
-#endif
 
-#endif /* APP_INC_APP_H_ */
+void task_dummy_update(void *parameters)
+{
+
+}
 
 /********************** end of file ******************************************/
