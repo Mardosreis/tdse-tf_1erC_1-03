@@ -114,14 +114,14 @@ A diferencia de los kits educativos de ascensores en miniatura disponibles comer
 
 El elevador Fundino es un kit educativo de cuatro plantas que proporciona una plataforma para que alumnos y estudiantes lleven a cabo una amplia gama de tareas de programación de PLC, utilizando el entorno de desarrollo Arduino sobre la base de una simulación realista de ascensor [1]. Las aplicaciones eléctricas y mecánicas están estrechamente relacionadas y ofrecen un alto nivel de oportunidades de aprendizaje. Una vista general de este sistema comercial se ilustra en la figura 1.1.
 
-![Fundino elevador](imagenes/image3.png)
+<img src="imagenes/image3.png" alt="Fundino elevador" width="400">
 Figura 1.1: Vista general del kit educativo Fundino elevador [1].
 
 ### Ascensor Encoder
 
 Los encoders son dispositivos que pueden convertir la posición o el movimiento de un eje a señales digitales que pueden ser leídas por un controlador lógico programable. En el caso de este trabajo, el encoder ayuda a determinar la posición exacta de la cabina entre los pisos y asegurar paradas precisas y suaves, tal como se observa en la figura 1.2 [2]. 
 
-![Ascensor Encoder](imagenes/image10.png)
+<img src="imagenes/image10.png" alt="Ascensor Encoder" width="400">
 Figura 1.2: Ascensor Ecopech de 3 pisos con Encoder [2].
 
 La tabla 1.1 contrasta las prestaciones de los dos productos comerciales de referencia contra el prototipo desarrollado en este trabajo.
@@ -225,49 +225,49 @@ Tabla 2.5: Caso de uso 4.
 
 Como unidad central de procesamiento se utilizó la placa STM32 Nucleo-F103RB, que se muestra en la figura 2.1, compatible con el ecosistema HAL. Esta placa gestiona toda la lógica del ascensor mediante una máquina de estados, el manejo de tiempos críticos mediante SysTick y TIM2 (PWM), y la comunicación con los periféricos mediante I2C1, SPI1 y USART3.
 
-![Nucleo-F103RB](imagenes/image11.png)
+<img src="imagenes/image11.png" alt="Nucleo-F103RB" width="400">
 Figura 2.1: Placa de desarrollo Nucleo-F103RB utilizada.
 
 ### 2.3.2. Motor y driver L298N
 
 Se utilizó un motorreductor DC de 12 V acoplado a una polea para el sistema de tracción de la cabina, controlado a través de un driver L298N [3] en configuración de puente H, tal como se muestra en la figura 2.2. La dirección de giro se controla mediante los pines IN1 e IN2, y la velocidad mediante PWM sobre el pin ENA.
 
-![Motor y L298N](imagenes/image6.png)
+<img src="imagenes/image6.png" alt="Motor y L298N" width="400">
 Figura 2.2: Motorreductor y driver L298N.
 
 ### 2.3.3. Celda de carga y amplificador HX711
 
 Para la detección de sobrecarga se utilizó una celda de carga tipo barra recta de 3 kg, junto al amplificador HX711 [4], que entrega el dato mediante un protocolo propio de dos hilos (DT y SCK). Ambos componentes se ilustran en la figura 2.3.
 
-![Celda de carga y HX711](imagenes/image4.png)
+<img src="imagenes/image4.png" alt="Celda de carga y HX711" width="400">
 Figura 2.3: Celda de carga y amplificador HX711.
 
 ### 2.3.4. Display LCD 16x2
 
 Se utilizó un display LCD 16x2 con interfaz I2C (PCF8574), que se observa en la figura 2.4 y muestra el piso actual, el estado del ascensor y el menú de configuración.
 
-![LCD 16x2](imagenes/image9.png)
+<img src="imagenes/image9.png" alt="LCD 16x2" width="400">
 Figura 2.4: Pantalla LCD 16x2 I2C utilizada.
 
 ### 2.3.5. Módulo RFID RC522
 
 Se integró un módulo lector RFID (Radio Frequency Identification, Identificación por Radiofrecuencia) RC522 [5], que se muestra en la figura 2.5, por bus SPI1, utilizado para el control de acceso opcional mediante tarjetas y llaveros.
 
-![Módulo RC522](imagenes/image2.png)
+<img src="imagenes/image2.png" alt="Módulo RC522" width="400">
 Figura 2.5: Módulo lector RFID RC522.
 
 ### 2.3.6. Módulo Bluetooth HM-10
 
 Se utilizó el módulo HM-10 (Bluetooth Low Energy) de la figura 2.6, conectado a USART3, para permitir el llamado de piso de forma remota desde una aplicación móvil.
 
-![Módulo HM-10](imagenes/image5.png)
+<img src="imagenes/image5.png" alt="Módulo HM-10" width="400">
 Figura 2.6: Módulo Bluetooth HM-10.
 
 ### 2.3.7. Botones, reed switches y llave de emergencia
 
 Se utilizaron seis pulsadores para las botoneras, tres sensores magnéticos reed switch para la detección de llegada a los pisos, y una llave de emergencia de tipo interruptor mantenido. Los pulsadores y los sensores se muestran en la figura 2.7.
 
-![Botones y sensores](imagenes/pulsador.webp)
+<img src="imagenes/pulsador.webp" alt="Botones y sensores" width="400">
 Figura 2.7: Botones y sensores magnéticos utilizados.
 
 ### 2.3.8. LEDs y buzzer
@@ -275,6 +275,7 @@ Figura 2.7: Botones y sensores magnéticos utilizados.
 Se utilizaron tres LEDs indicadores y un buzzer activo, ilustrados en la figura 2.8, para la señalización visual y sonora de los eventos del sistema.
 
 ![LEDs y buzzer](imagenes/BUZZER-3.3V-5V-ACTIVO-2.webp)
+<img src="imagenes/pulsador.webp" alt="Botones y sensores" width="400">
 Figura 2.8: LEDs y buzzer activo.
 
 # Capítulo 3: Diseño e implementación
