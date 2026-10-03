@@ -274,8 +274,7 @@ Figura 2.7: Botones y sensores magnéticos utilizados.
 
 Se utilizaron tres LEDs indicadores y un buzzer activo, ilustrados en la figura 2.8, para la señalización visual y sonora de los eventos del sistema.
 
-![LEDs y buzzer](imagenes/BUZZER-3.3V-5V-ACTIVO-2.webp)
-<img src="imagenes/pulsador.webp" alt="Botones y sensores" width="400">
+<img src="imagenes/BUZZER-3.3V-5V-ACTIVO-2.webp" alt="LEDs y buzzer" width="400">
 Figura 2.8: LEDs y buzzer activo.
 
 # Capítulo 3: Diseño e implementación
@@ -311,19 +310,19 @@ Tabla 3.1: Asignación de pines del sistema.
 | HX711 | DT / SCK | PC4 / PC5 | GPIO_Input / GPIO_Output |
 | HM-10 USART3 | TX / RX | PB10 / PB11 | USART3 |
 
-![Configuración .ioc](imagenes/iov.webp)
+<img src="imagenes/iov.webp" alt="Configuración .ioc" width="400">
 Figura 3.1: Configuración de pines en STM32CubeMX.
 
-![Placa soldada - frente](imagenes/placa_frente.webp)
+<img src="imagenes/placa_frente.webp" alt="Placa soldada - frente" width="400">
 Figura 3.2: Placa experimental soldada vista de frente.
 
-![Placa soldada - dorso](imagenes/placa_dorso.webp)
+<img src="imagenes/placa_dorso.webp" alt="Placa soldada - dorso" width="400">
 Figura 3.3: Placa experimental soldada vista de dorso.
 
-![Maqueta frente](imagenes/maqueta_frente.webp)
+<img src="imagenes/maqueta_frente.webp" alt="Maqueta frente" width="400">
 Figura 3.4: Maqueta mecánica completa del ascensor de frente.
 
-![Maqueta dorso](imagenes/maqueta_dorso.webp)
+<img src="imagenes/maqueta_dorso.webp" alt="Maqueta dorso" width="400">
 Figura 3.5: Maqueta mecánica completa del ascensor de dorso.
 
 ## 3.2. Descripción del comportamiento (máquina de estados)
@@ -334,14 +333,14 @@ Desde el estado IDLE, ante un pedido de piso pendiente, el sistema transiciona a
 
 Los estados EMERGENCIA y FALLA tienen prioridad absoluta. Cualquier evento de activación de la llave de emergencia interrumpe el estado actual y lleva al sistema a EMERGENCIA. El estado FALLA se alcanza si el temporizador de viaje vence sin detectar llegada. La figura 3.6 muestra el diagrama completo de estas transiciones.
 
-![Diagrama de estados](imagenes/image7.png)
+<img src="imagenes/image7.png" alt="Diagrama de estados" width="400">
 Figura 3.6: Máquina de estados finitos del sistema.
 
 ## 3.3. Arquitectura del firmware
 
 El firmware se estructura en las etapas de escrutar, procesar y actuar, comunicadas mediante una cola de eventos, sobre un ejecutor cíclico con un tick de 1 ms. Ningún módulo utiliza demoras bloqueantes en su lógica de operación regular. La figura 3.7 ilustra este flujo.
 
-![Orden de despacho](imagenes/image1.png)
+<img src="imagenes/image1.png" alt="Orden de despacho" width="400">
 Figura 3.7: Orden de despacho de las tareas dentro de una vuelta del ejecutivo cíclico.
 
 ### 3.3.1. Módulo tick
@@ -402,7 +401,8 @@ Tabla 4.1: Resumen de ensayos funcionales de hardware y firmware.
 
 Al finalizar la compilación, el entorno genera el reporte de uso de memoria. La figura 4.1 muestra este reporte, sirviendo como evidencia de que el firmware del ascensor compila correctamente.
 
-![Build Analyzer](imagenes/Memoria.webp)
+<img src="imagenes/Memoria.webp" alt="Build Analyzer" width="400">
+Orden de despacho
 Figura 4.1: Reporte de uso de memoria RAM y FLASH en STM32CubeIDE.
 
 Con el fin de facilitar la interpretación de estos resultados, la tabla 4.2 desglosa el aporte de cada sección del binario a la ocupación real de las regiones físicas de memoria del microcontrolador.
@@ -419,7 +419,7 @@ Como se desprende de la métrica final, el firmware utiliza aproximadamente un 1
 
 En esta sección se busca comprender el comportamiento temporal del programa. Para esto se observa la variable WCET (Worst-Case Execution Time), que muestra el peor caso de ejecución de una tarea. La figura 4.2 muestra los resultados observados en el depurador.
 
-![WCET](imagenes/WCET.webp)
+<img src="imagenes/WCET.webp" alt="WCET" width="400">
 Figura 4.2: Pantalla de Live Expressions con los peores tiempos de ejecución en microsegundos.
 
 En la tabla 4.3 se detalla el WCET medido de cada tarea fundamental del ciclo.
