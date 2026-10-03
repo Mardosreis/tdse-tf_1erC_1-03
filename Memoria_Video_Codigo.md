@@ -114,14 +114,14 @@ A diferencia de los kits educativos de ascensores en miniatura disponibles comer
 
 El elevador Fundino es un kit educativo de cuatro plantas que proporciona una plataforma para que alumnos y estudiantes lleven a cabo una amplia gama de tareas de programación de PLC, utilizando el entorno de desarrollo Arduino sobre la base de una simulación realista de ascensor [1]. Las aplicaciones eléctricas y mecánicas están estrechamente relacionadas y ofrecen un alto nivel de oportunidades de aprendizaje. Una vista general de este sistema comercial se ilustra en la figura 1.1.
 
-<img src="imagenes/image3.png" alt="Fundino elevador" width="400">
+<img src="imagenes/image3.png" alt="Fundino elevador" width="400"><br>
 Figura 1.1: Vista general del kit educativo Fundino elevador [1].
 
 ### Ascensor Encoder
 
 Los encoders son dispositivos que pueden convertir la posición o el movimiento de un eje a señales digitales que pueden ser leídas por un controlador lógico programable. En el caso de este trabajo, el encoder ayuda a determinar la posición exacta de la cabina entre los pisos y asegurar paradas precisas y suaves, tal como se observa en la figura 1.2 [2]. 
 
-<img src="imagenes/image10.png" alt="Ascensor Encoder" width="400">
+<img src="imagenes/image10.png" alt="Ascensor Encoder" width="400"><br>
 Figura 1.2: Ascensor Ecopech de 3 pisos con Encoder [2].
 
 La tabla 1.1 contrasta las prestaciones de los dos productos comerciales de referencia contra el prototipo desarrollado en este trabajo.
@@ -225,56 +225,56 @@ Tabla 2.5: Caso de uso 4.
 
 Como unidad central de procesamiento se utilizó la placa STM32 Nucleo-F103RB, que se muestra en la figura 2.1, compatible con el ecosistema HAL. Esta placa gestiona toda la lógica del ascensor mediante una máquina de estados, el manejo de tiempos críticos mediante SysTick y TIM2 (PWM), y la comunicación con los periféricos mediante I2C1, SPI1 y USART3.
 
-<img src="imagenes/image11.png" alt="Nucleo-F103RB" width="400">
+<img src="imagenes/image11.png" alt="Nucleo-F103RB" width="400"><br>
 Figura 2.1: Placa de desarrollo Nucleo-F103RB utilizada.
 
 ### 2.3.2. Motor y driver L298N
 
 Se utilizó un motorreductor DC de 12 V acoplado a una polea para el sistema de tracción de la cabina, controlado a través de un driver L298N [3] en configuración de puente H, tal como se muestra en la figura 2.2. La dirección de giro se controla mediante los pines IN1 e IN2, y la velocidad mediante PWM sobre el pin ENA.
 
-<img src="imagenes/image6.png" alt="Motor y L298N" width="400">
+<img src="imagenes/image6.png" alt="Motor y L298N" width="400"><br>
 Figura 2.2: Motorreductor y driver L298N.
 
 ### 2.3.3. Celda de carga y amplificador HX711
 
 Para la detección de sobrecarga se utilizó una celda de carga tipo barra recta de 3 kg, junto al amplificador HX711 [4], que entrega el dato mediante un protocolo propio de dos hilos (DT y SCK). Ambos componentes se ilustran en la figura 2.3.
 
-<img src="imagenes/image4.png" alt="Celda de carga y HX711" width="400">
+<img src="imagenes/image4.png" alt="Celda de carga y HX711" width="400"><br>
 Figura 2.3: Celda de carga y amplificador HX711.
 
 ### 2.3.4. Display LCD 16x2
 
 Se utilizó un display LCD 16x2 con interfaz I2C (PCF8574), que se observa en la figura 2.4 y muestra el piso actual, el estado del ascensor y el menú de configuración.
 
-<img src="imagenes/image9.png" alt="LCD 16x2" width="400">
+<img src="imagenes/image9.png" alt="LCD 16x2" width="400"><br>
 Figura 2.4: Pantalla LCD 16x2 I2C utilizada.
 
 ### 2.3.5. Módulo RFID RC522
 
 Se integró un módulo lector RFID (Radio Frequency Identification, Identificación por Radiofrecuencia) RC522 [5], que se muestra en la figura 2.5, por bus SPI1, utilizado para el control de acceso opcional mediante tarjetas y llaveros.
 
-<img src="imagenes/image2.png" alt="Módulo RC522" width="400">
+<img src="imagenes/image2.png" alt="Módulo RC522" width="400"><br>
 Figura 2.5: Módulo lector RFID RC522.
 
 ### 2.3.6. Módulo Bluetooth HM-10
 
 Se utilizó el módulo HM-10 (Bluetooth Low Energy) de la figura 2.6, conectado a USART3, para permitir el llamado de piso de forma remota desde una aplicación móvil.
 
-<img src="imagenes/image5.png" alt="Módulo HM-10" width="400">
+<img src="imagenes/image5.png" alt="Módulo HM-10" width="400"><br>
 Figura 2.6: Módulo Bluetooth HM-10.
 
 ### 2.3.7. Botones, reed switches y llave de emergencia
 
 Se utilizaron seis pulsadores para las botoneras, tres sensores magnéticos reed switch para la detección de llegada a los pisos, y una llave de emergencia de tipo interruptor mantenido. Los pulsadores y los sensores se muestran en la figura 2.7.
 
-<img src="imagenes/pulsador.webp" alt="Botones y sensores" width="400">
+<img src="imagenes/pulsador.webp" alt="Botones y sensores" width="400"><br>
 Figura 2.7: Botones y sensores magnéticos utilizados.
 
 ### 2.3.8. LEDs y buzzer
 
 Se utilizaron tres LEDs indicadores y un buzzer activo, ilustrados en la figura 2.8, para la señalización visual y sonora de los eventos del sistema.
 
-<img src="imagenes/BUZZER-3.3V-5V-ACTIVO-2.webp" alt="LEDs y buzzer" width="400">
+<img src="imagenes/BUZZER-3.3V-5V-ACTIVO-2.webp" alt="LEDs y buzzer" width="400"><br>
 Figura 2.8: LEDs y buzzer activo.
 
 # Capítulo 3: Diseño e implementación
@@ -310,19 +310,19 @@ Tabla 3.1: Asignación de pines del sistema.
 | HX711 | DT / SCK | PC4 / PC5 | GPIO_Input / GPIO_Output |
 | HM-10 USART3 | TX / RX | PB10 / PB11 | USART3 |
 
-<img src="imagenes/iov.webp" alt="Configuración .ioc" width="400">
+<img src="imagenes/iov.webp" alt="Configuración .ioc" width="400"><br>
 Figura 3.1: Configuración de pines en STM32CubeMX.
 
-<img src="imagenes/placa_frente.webp" alt="Placa soldada - frente" width="400">
+<img src="imagenes/placa_frente.webp" alt="Placa soldada - frente" width="400"><br>
 Figura 3.2: Placa experimental soldada vista de frente.
 
-<img src="imagenes/placa_dorso.webp" alt="Placa soldada - dorso" width="400">
+<img src="imagenes/placa_dorso.webp" alt="Placa soldada - dorso" width="400"><br>
 Figura 3.3: Placa experimental soldada vista de dorso.
 
-<img src="imagenes/maqueta_frente.webp" alt="Maqueta frente" width="400">
+<img src="imagenes/maqueta_frente.webp" alt="Maqueta frente" width="400"><br>
 Figura 3.4: Maqueta mecánica completa del ascensor de frente.
 
-<img src="imagenes/maqueta_dorso.webp" alt="Maqueta dorso" width="400">
+<img src="imagenes/maqueta_dorso.webp" alt="Maqueta dorso" width="400"><br>
 Figura 3.5: Maqueta mecánica completa del ascensor de dorso.
 
 ## 3.2. Descripción del comportamiento (máquina de estados)
@@ -333,14 +333,14 @@ Desde el estado IDLE, ante un pedido de piso pendiente, el sistema transiciona a
 
 Los estados EMERGENCIA y FALLA tienen prioridad absoluta. Cualquier evento de activación de la llave de emergencia interrumpe el estado actual y lleva al sistema a EMERGENCIA. El estado FALLA se alcanza si el temporizador de viaje vence sin detectar llegada. La figura 3.6 muestra el diagrama completo de estas transiciones.
 
-<img src="imagenes/image7.png" alt="Diagrama de estados" width="400">
+<img src="imagenes/image7.png" alt="Diagrama de estados" width="400"><br>
 Figura 3.6: Máquina de estados finitos del sistema.
 
 ## 3.3. Arquitectura del firmware
 
 El firmware se estructura en las etapas de escrutar, procesar y actuar, comunicadas mediante una cola de eventos, sobre un ejecutor cíclico con un tick de 1 ms. Ningún módulo utiliza demoras bloqueantes en su lógica de operación regular. La figura 3.7 ilustra este flujo.
 
-<img src="imagenes/image1.png" alt="Orden de despacho" width="400">
+<img src="imagenes/image1.png" alt="Orden de despacho" width="400"><br>
 Figura 3.7: Orden de despacho de las tareas dentro de una vuelta del ejecutivo cíclico.
 
 ### 3.3.1. Módulo tick
@@ -401,7 +401,7 @@ Tabla 4.1: Resumen de ensayos funcionales de hardware y firmware.
 
 Al finalizar la compilación, el entorno genera el reporte de uso de memoria. La figura 4.1 muestra este reporte, sirviendo como evidencia de que el firmware del ascensor compila correctamente.
 
-<img src="imagenes/Memoria.webp" alt="Build Analyzer" width="400">
+<img src="imagenes/Memoria.webp" alt="Build Analyzer" width="400"><br>
 Orden de despacho
 Figura 4.1: Reporte de uso de memoria RAM y FLASH en STM32CubeIDE.
 
@@ -419,7 +419,7 @@ Como se desprende de la métrica final, el firmware utiliza aproximadamente un 1
 
 En esta sección se busca comprender el comportamiento temporal del programa. Para esto se observa la variable WCET (Worst-Case Execution Time), que muestra el peor caso de ejecución de una tarea. La figura 4.2 muestra los resultados observados en el depurador.
 
-<img src="imagenes/WCET.webp" alt="WCET" width="400">
+<img src="imagenes/WCET.webp" alt="WCET" width="400"><br>
 Figura 4.2: Pantalla de Live Expressions con los peores tiempos de ejecución en microsegundos.
 
 En la tabla 4.3 se detalla el WCET medido de cada tarea fundamental del ciclo.
