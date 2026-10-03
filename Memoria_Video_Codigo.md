@@ -61,6 +61,7 @@ Tabla 1: Registro de versiones del documento.
 | :---: | :--- | :---: |
 | 1.0 | Creación del esqueleto y estructura base del documento. | 08/07/2026 |
 | 1.1 | Redacción detallada, desarrollo y completado de las secciones del informe. | 20/09/2026 |
+| 1.2 | Corrección en el formato del informe | 03/10/2026 |
 
 # Índice
 
